@@ -71,9 +71,9 @@ GALAXY_COLOR_PRESETS = [
 
 def calculate_pitch_angle(b):
     """
-    Вычисляет угол закрутки (pitch angle) из параметра arms_curve
-    Для логарифмической спирали: r = a * e^(b*theta)
-    pitch_angle = arctan(b) в градусах
+    Calculates the pitch angle from the arms_curve parameter
+    For a logarithmic spiral: r = a * e^(b*theta)
+    pitch_angle = arctan(b) in degrees
     """
     if b < 0.001:
         return 90.0
@@ -83,7 +83,7 @@ def calculate_pitch_angle(b):
 
 
 def calculate_b_from_pitch(pitch_degrees):
-    """Обратная функция: b = tan(pitch)"""
+    """Inverse function: b = tan(pitch)"""
     pitch_rad = np.radians(pitch_degrees)
     if pitch_rad < 0.001:
         return 100.0
@@ -91,14 +91,14 @@ def calculate_b_from_pitch(pitch_degrees):
 
 
 def add_noise(image, shot_noise=2.0, read_noise=1.5):
-    """Добавляет шум: shot noise + read noise"""
+    """Adds noise: shot noise + read noise"""
     noise = np.random.normal(0, read_noise, image.shape)
     noisy = image.astype(np.float32) + noise
     return np.clip(noisy, 0, 255).astype(np.uint8)
 
 
 def apply_psf(image, kernel_size=3):
-    """Применяет PSF (размытие атмосферы/телескопа)"""
+    """Applies PSF (atmosphere/telescope blur)"""
     kernel = np.ones((kernel_size, kernel_size), dtype=np.float32) / (kernel_size ** 2)
     result = np.zeros_like(image, dtype=np.float32)
     for c in range(3):
@@ -107,7 +107,7 @@ def apply_psf(image, kernel_size=3):
 
 
 def apply_vignetting(image, strength=0.35):
-    """Добавляет виньетирование (затемнение к краям)"""
+    """Adds vignetting (darkening towards the edges)"""
     h, w = image.shape[:2]
     center_x, center_y = w // 2, h // 2
     Y, X = np.ogrid[:h, :w]
@@ -119,13 +119,13 @@ def apply_vignetting(image, strength=0.35):
 
 
 def add_sky_background(image, sky_level_range=(5, 25)):
-    """Добавляет случайный фон неба"""
+    """Adds random sky background"""
     sky_level = np.random.randint(*sky_level_range)
     return np.clip(image.astype(int) + sky_level, 0, 255).astype(np.uint8)
 
 
 def post_process_screenshot(image):
-    """Применяет все эффекты пост-обработки"""
+    """Applies all post-processing effects"""
     image = add_noise(image)
     image = apply_psf(image, kernel_size=3)
     image = apply_vignetting(image, strength=0.35)
@@ -294,7 +294,7 @@ def generate_galaxy():
     colors_all = []
     dust_x, dust_y, dust_z = [], [], []
 
-    # ========== 1. ЯДРО (BULGE) ==========
+    # ========== 1. BULGE ==========
     if params.has_bulge:
         n_bulge = int(n_total * 0.2)
         n_sersic = params.bulge_sersic_n
@@ -321,7 +321,7 @@ def generate_galaxy():
             color_idx = random.randint(0, len(current_preset['bulge_colors']) - 1)
             colors_all.append(current_preset['bulge_colors'][color_idx])
 
-    # ========== 2. СПИРАЛЬНЫЕ РУКАВА ==========
+    # ========== 2. SPIRAL ARMS ==========
     theta_values = np.linspace(0, params.max_theta, 2000)
     n_arms_stars = n_total - (n_bulge if params.has_bulge else 0)
     stars_per_arm = n_arms_stars // params.num_arms
@@ -397,12 +397,12 @@ def generate_galaxy():
                 vertex_colors.extend([1.0, 1.0, 1.0, 1.0])
 
         vertex_colors = np.array(vertex_colors, dtype=np.float32)
-        print(f"Вершин: {len(vertices)}, Цветов элементов: {len(vertex_colors)}")
-        print(f"Соотношение: {len(vertex_colors) / len(vertices)} (должно быть 4.0)")
+        print(f"Vertices: {len(vertices)}, Element Colors: {len(vertex_colors)}")
+        print(f"Ratio: {len(vertex_colors) / len(vertices)} (should be 4.0)")
 
         vertex_colors = np.array(vertex_colors, dtype=np.float32)
 
-        print(f"Вершин: {len(vertices)}, Цветов: {len(vertex_colors) // 3}")
+        print(f"Vertices: {len(vertices)}, Colors: {len(vertex_colors) // 3}")
 
         mesh = Mesh(
             vertices=vertices,
@@ -428,7 +428,7 @@ def generate_galaxy():
 
 
 def add_flocculent_segments(x_base, y_base, theta, arm_offset, x_out, y_out, z_out, c_out, preset):
-    """Добавляет короткие сегменты рукавов"""
+    """Adds short segments of arms"""
     n_segments = np.random.randint(3, 8)
 
     for _ in range(n_segments):
