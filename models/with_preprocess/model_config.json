@@ -1,0 +1,20 @@
+{
+  "original_image_size": [
+    600,
+    600
+  ],
+  "input_image_size": [
+    224,
+    224
+  ],
+  "batch_size": 32,
+  "epochs_phase1": 40,
+  "epochs_phase2": 30,
+  "num_train_samples": 6721,
+  "num_val_samples": 961,
+  "num_test_samples": 1921,
+  "pitch_angle_range": [
+    5.14,
+    26.56
+  ]
+}
